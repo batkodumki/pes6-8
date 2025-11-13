@@ -77,10 +77,8 @@ function updateFacts() {
         }
     }
 
-    const f8Input = document.getElementById('f8');
-    if (f8Input) {
-        facts.f8 = parseInt(f8Input.value) || 1;
-    }
+    // f8 завжди залишається 1
+    facts.f8 = 1;
 }
 
 // Синхронізація фактів з інтерфейсом
@@ -96,10 +94,7 @@ function syncFactsToUI() {
         }
     }
 
-    const f8Input = document.getElementById('f8');
-    if (f8Input) {
-        f8Input.value = facts.f8;
-    }
+    // f8 завжди = 1, не потребує синхронізації
 }
 
 // Дії продукційних правил (відповідно до прикладу з ЛР5)
