@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Експертна система налаштування температури води</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Експертна система налаштування температури води в душі</h1>
+        <p class="subtitle">Лабораторні роботи №6, 7, 8 – Продукційне представлення знань</p>
+
+        <div class="main-content">
+            <!-- Блок 1: Факти та їх стан -->
+            <div class="block">
+                <h2>Факти та їх стан</h2>
+                <table class="facts-table">
+                    <thead>
+                        <tr>
+                            <th>Факт</th>
+                            <th>Опис</th>
+                            <th>Значення</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>f1</td>
+                            <td>Вентиль гарячої води відкритий</td>
+                            <td>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="f1" onchange="updateFacts()">
+                                    <span class="status" id="status-f1">false</span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>f2</td>
+                            <td>Вентиль холодної води відкритий</td>
+                            <td>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="f2" onchange="updateFacts()">
+                                    <span class="status" id="status-f2">false</span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>f3</td>
+                            <td>Вентиль гарячої води повністю відкритий</td>
+                            <td>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="f3" onchange="updateFacts()">
+                                    <span class="status" id="status-f3">false</span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>f4</td>
+                            <td>Вентиль холодної води повністю відкритий</td>
+                            <td>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="f4" onchange="updateFacts()">
+                                    <span class="status" id="status-f4">false</span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>f5</td>
+                            <td>Вода гаряча</td>
+                            <td>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="f5" onchange="updateFacts()">
+                                    <span class="status" id="status-f5">false</span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>f6</td>
+                            <td>Вода холодна</td>
+                            <td>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="f6" onchange="updateFacts()">
+                                    <span class="status" id="status-f6">false</span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>f7</td>
+                            <td>Вода тепла (мета)</td>
+                            <td>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="f7" onchange="updateFacts()">
+                                    <span class="status goal" id="status-f7">false</span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>f8</td>
+                            <td>Крок відкриття вентиля</td>
+                            <td>
+                                <input type="number" id="f8" value="1" min="1" max="10" onchange="updateFacts()">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Блок 2: База правил -->
+            <div class="block">
+                <h2>База продукційних правил</h2>
+                <div class="rules-list">
+                    <div class="rule">
+                        <strong>Правило 1:</strong>
+                        <p>Блок P: ¬f4 ∧ ¬f7</p>
+                        <p>Блок A: f1 ∧ f5</p>
+                        <p>Дія: ВідкритиВентильХолодноїВодиНа(f8)</p>
+                        <p class="rule-desc">Якщо вода гаряча і вентиль гарячої води відкритий, відкрити вентиль холодної води</p>
+                    </div>
+                    <div class="rule">
+                        <strong>Правило 2:</strong>
+                        <p>Блок P: ¬f3 ∧ ¬f7</p>
+                        <p>Блок A: f2 ∧ f6</p>
+                        <p>Дія: ВідкритиВентильГарячоїВодиНа(f8)</p>
+                        <p class="rule-desc">Якщо вода холодна і вентиль холодної води відкритий, відкрити вентиль гарячої води</p>
+                    </div>
+                    <div class="rule">
+                        <strong>Правило 3:</strong>
+                        <p>Блок P: f3 ∧ ¬f7</p>
+                        <p>Блок A: f1 ∧ f2 ∧ f5</p>
+                        <p>Дія: ЗакритиВентильГарячоїВоди()</p>
+                        <p class="rule-desc">Якщо обидва вентилі відкриті, вода гаряча, і вентиль гарячої води повністю відкритий, закрити вентиль гарячої води</p>
+                    </div>
+                    <div class="rule">
+                        <strong>Правило 4:</strong>
+                        <p>Блок P: f4 ∧ ¬f7</p>
+                        <p>Блок A: f1 ∧ f2 ∧ f6</p>
+                        <p>Dія: ЗакритиВентильХолодноїВоди()</p>
+                        <p class="rule-desc">Якщо обидва вентилі відкриті, вода холодна, і вентиль холодної води повністю відкритий, закрити вентиль холодної води</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Блок 3: Керування -->
+            <div class="block controls">
+                <h2>Керування</h2>
+                <div class="buttons">
+                    <button onclick="runAlgorithm()" class="btn btn-primary">Запустити алгоритм</button>
+                    <button onclick="clearProtocol()" class="btn btn-secondary">Очистити протокол</button>
+                    <button onclick="resetFacts()" class="btn btn-secondary">Скинути до початкових значень</button>
+                    <button onclick="printResults()" class="btn btn-secondary">Друк результатів</button>
+                </div>
+            </div>
+
+            <!-- Блок 4: Пояснення для користувача (ЛР7) -->
+            <div class="block">
+                <h2>Пояснення для користувача</h2>
+                <div id="explanations" class="explanations"></div>
+            </div>
+
+            <!-- Блок 5: Протокол роботи алгоритму (ЛР6) -->
+            <div class="block">
+                <h2>Протокол роботи алгоритму</h2>
+                <div id="protocol" class="protocol"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
