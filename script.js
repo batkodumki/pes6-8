@@ -107,7 +107,8 @@ function openColdValve() {
 
     return {
         action: 'ВідкритиВентильХолодноїВодиНа(' + facts.f8 + ')',
-        changes: getFactChanges(oldFacts, facts)
+        changes: getFactChanges(oldFacts, facts),
+        description: 'Нехай у цей момент вентиль став повністю відкритий.'
     };
 }
 
@@ -119,7 +120,8 @@ function openHotValve() {
 
     return {
         action: 'ВідкритиВентильГарячоїВодиНа(' + facts.f8 + ')',
-        changes: getFactChanges(oldFacts, facts)
+        changes: getFactChanges(oldFacts, facts),
+        description: 'Нехай у цей момент вентиль став повністю відкритий, а вода залишається холодною.'
     };
 }
 
@@ -131,7 +133,8 @@ function closeHotValve() {
 
     return {
         action: 'ЗакритиВентильГарячоїВоди()',
-        changes: getFactChanges(oldFacts, facts)
+        changes: getFactChanges(oldFacts, facts),
+        description: 'Вентиль гарячої води закривається.'
     };
 }
 
@@ -143,7 +146,8 @@ function closeColdValve() {
 
     return {
         action: 'ЗакритиВентильХолодноїВоди()',
-        changes: getFactChanges(oldFacts, facts)
+        changes: getFactChanges(oldFacts, facts),
+        description: 'Вентиль холодної води закривається.'
     };
 }
 
@@ -170,7 +174,7 @@ function executeAction(actionName) {
         case 'closeColdValve':
             return closeColdValve();
         default:
-            return { action: 'Невідома дія', changes: [] };
+            return { action: 'Невідома дія', changes: [], description: '' };
     }
 }
 
@@ -237,9 +241,17 @@ function runAlgorithm() {
                 const result = executeAction(rule.action);
 
                 addToProtocol(`Викликається функція: ${result.action}`, 'step');
+
+                // Додаємо опис того, що відбулося
+                if (result.description) {
+                    addToProtocol(result.description, 'step');
+                }
+
+                // Виводимо зміни фактів
                 if (result.changes.length > 0) {
+                    addToProtocol('В цей момент змінюються факти:', 'step');
                     result.changes.forEach(change => {
-                        addToProtocol(`Змінено: ${change}`, 'step');
+                        addToProtocol(`  ${change}`, 'step');
                     });
                     addToExplanation(`Змінено факти: ${result.changes.join(', ')}`, 'step');
                 }
