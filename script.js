@@ -108,7 +108,7 @@ function openColdValve() {
     return {
         action: 'ВідкритиВентильХолодноїВодиНа(' + facts.f8 + ')',
         changes: getFactChanges(oldFacts, facts),
-        description: 'Нехай у цей момент вентиль став повністю відкритий.'
+        description: 'Нехай у цей момент вентиль холодної води став повністю відкритий, а вода залишається гарячою.'
     };
 }
 
@@ -121,7 +121,7 @@ function openHotValve() {
     return {
         action: 'ВідкритиВентильГарячоїВодиНа(' + facts.f8 + ')',
         changes: getFactChanges(oldFacts, facts),
-        description: 'Нехай у цей момент вентиль став повністю відкритий, а вода залишається холодною.'
+        description: 'Нехай у цей момент вентиль гарячої води став повністю відкритий, а вода залишається холодною.'
     };
 }
 
@@ -132,9 +132,9 @@ function closeHotValve() {
     facts.f3 = false;
 
     return {
-        action: 'ЗакритиВентильГарячоїВоди()',
+        action: 'ЗакритиВентільГарячоїВоди()',
         changes: getFactChanges(oldFacts, facts),
-        description: 'Вентиль гарячої води закривається.'
+        description: 'Вентиль гарячої води закривається. Тепер вентилі гарячої води відкритий = false і повністю відкритий = false.'
     };
 }
 
@@ -147,7 +147,7 @@ function closeColdValve() {
     return {
         action: 'ЗакритиВентильХолодноїВоди()',
         changes: getFactChanges(oldFacts, facts),
-        description: 'Вентиль холодної води закривається.'
+        description: 'Вентиль холодної води закривається. Тепер вентилі холодної води відкритий = false і повністю відкритий = false.'
     };
 }
 
