@@ -10,52 +10,48 @@ let facts = {
     f8: 1      // крок відкриття вентиля
 };
 
-// Лічильники для моделювання відкриття вентилів
-let hotValveLevel = 0;    // Рівень відкриття гарячої води (0-100)
-let coldValveLevel = 0;   // Рівень відкриття холодної води (0-100)
-const MAX_LEVEL = 100;
-
 // База продукційних правил
+// Формат: <номер, A (ядро), P (умова), дія>
 const rules = [
     {
         id: 1,
-        p: () => !facts.f4 && !facts.f7,
         a: () => facts.f1 && facts.f5,
+        p: () => !facts.f4 && !facts.f7,
         action: 'openColdValve',
-        pDescription: '¬f4 ∧ ¬f7',
         aDescription: 'f1 ∧ f5',
+        pDescription: '¬f4 ∧ ¬f7',
         actionDescription: 'ВідкритиВентильХолодноїВодиНа(f8)',
-        explanation: 'Вода занадто гаряча. Відкриваємо вентиль холодної води для охолодження.'
+        explanation: 'Вода занадто гаряча і вентиль гарячої води відкритий. Відкриваємо вентиль холодної води на крок f8.'
     },
     {
         id: 2,
-        p: () => !facts.f3 && !facts.f7,
         a: () => facts.f2 && facts.f6,
+        p: () => !facts.f3 && !facts.f7,
         action: 'openHotValve',
-        pDescription: '¬f3 ∧ ¬f7',
         aDescription: 'f2 ∧ f6',
+        pDescription: '¬f3 ∧ ¬f7',
         actionDescription: 'ВідкритиВентильГарячоїВодиНа(f8)',
-        explanation: 'Вода занадто холодна. Відкриваємо вентиль гарячої води для нагрівання.'
+        explanation: 'Вода занадто холодна і вентиль холодної води відкритий. Відкриваємо вентиль гарячої води на крок f8.'
     },
     {
         id: 3,
-        p: () => facts.f3 && !facts.f7,
         a: () => facts.f1 && facts.f2 && facts.f5,
+        p: () => facts.f3 && !facts.f7,
         action: 'closeHotValve',
-        pDescription: 'f3 ∧ ¬f7',
         aDescription: 'f1 ∧ f2 ∧ f5',
+        pDescription: 'f3 ∧ ¬f7',
         actionDescription: 'ЗакритиВентильГарячоїВоди()',
-        explanation: 'Вентиль гарячої води повністю відкритий, але вода все ще гаряча. Закриваємо гарячу воду.'
+        explanation: 'Обидва вентилі відкриті, вода гаряча, і вентиль гарячої води повністю відкритий. Закриваємо вентиль гарячої води.'
     },
     {
         id: 4,
-        p: () => facts.f4 && !facts.f7,
         a: () => facts.f1 && facts.f2 && facts.f6,
+        p: () => facts.f4 && !facts.f7,
         action: 'closeColdValve',
-        pDescription: 'f4 ∧ ¬f7',
         aDescription: 'f1 ∧ f2 ∧ f6',
+        pDescription: 'f4 ∧ ¬f7',
         actionDescription: 'ЗакритиВентильХолодноїВоди()',
-        explanation: 'Вентиль холодної води повністю відкритий, але вода все ще холодна. Закриваємо холодну воду.'
+        explanation: 'Обидва вентилі відкриті, вода холодна, і вентиль холодної води повністю відкритий. Закриваємо вентиль холодної води.'
     }
 ];
 
@@ -106,19 +102,13 @@ function syncFactsToUI() {
     }
 }
 
-// Дії продукційних правил
+// Дії продукційних правил (відповідно до прикладу з ЛР5)
 function openColdValve() {
     const oldFacts = { ...facts };
 
-    facts.f2 = true;  // Відкриваємо вентиль холодної води
-    coldValveLevel += facts.f8 * 10;
-
-    if (coldValveLevel >= MAX_LEVEL) {
-        coldValveLevel = MAX_LEVEL;
-        facts.f4 = true;  // Повністю відкритий
-    }
-
-    updateTemperature();
+    // Згідно з прикладом: f4 стає true, f2 стає false
+    facts.f4 = true;  // Вентиль холодної води повністю відкритий
+    facts.f2 = false;
 
     return {
         action: 'ВідкритиВентильХолодноїВодиНа(' + facts.f8 + ')',
@@ -129,15 +119,8 @@ function openColdValve() {
 function openHotValve() {
     const oldFacts = { ...facts };
 
-    facts.f1 = true;  // Відкриваємо вентиль гарячої води
-    hotValveLevel += facts.f8 * 10;
-
-    if (hotValveLevel >= MAX_LEVEL) {
-        hotValveLevel = MAX_LEVEL;
-        facts.f3 = true;  // Повністю відкритий
-    }
-
-    updateTemperature();
+    // Згідно з прикладом: f3 стає true
+    facts.f3 = true;  // Вентиль гарячої води повністю відкритий
 
     return {
         action: 'ВідкритиВентильГарячоїВодиНа(' + facts.f8 + ')',
@@ -150,9 +133,6 @@ function closeHotValve() {
 
     facts.f1 = false;
     facts.f3 = false;
-    hotValveLevel = 0;
-
-    updateTemperature();
 
     return {
         action: 'ЗакритиВентильГарячоїВоди()',
@@ -165,47 +145,11 @@ function closeColdValve() {
 
     facts.f2 = false;
     facts.f4 = false;
-    coldValveLevel = 0;
-
-    updateTemperature();
 
     return {
         action: 'ЗакритиВентильХолодноїВоди()',
         changes: getFactChanges(oldFacts, facts)
     };
-}
-
-// Оновлення температури води на основі рівнів вентилів
-function updateTemperature() {
-    const totalLevel = hotValveLevel + coldValveLevel;
-
-    if (totalLevel === 0) {
-        facts.f5 = false;
-        facts.f6 = false;
-        facts.f7 = false;
-        return;
-    }
-
-    const hotRatio = hotValveLevel / totalLevel;
-
-    // Моделюємо температуру:
-    // - якщо більше 70% гарячої - гаряча
-    // - якщо менше 30% гарячої - холодна
-    // - інакше - тепла
-
-    if (hotRatio > 0.7) {
-        facts.f5 = true;
-        facts.f6 = false;
-        facts.f7 = false;
-    } else if (hotRatio < 0.3) {
-        facts.f5 = false;
-        facts.f6 = true;
-        facts.f7 = false;
-    } else if (hotValveLevel > 0 && coldValveLevel > 0) {
-        facts.f5 = false;
-        facts.f6 = false;
-        facts.f7 = true;
-    }
 }
 
 // Порівняння фактів для виявлення змін
@@ -246,7 +190,8 @@ function runAlgorithm() {
 
     // Додаємо початковий стан
     addToProtocol('=== ПОЧАТОК РОБОТИ АЛГОРИТМУ ===', 'step');
-    addToProtocol('Початковий стан фактів: ' + JSON.stringify(facts, null, 2), 'step');
+    addToProtocol('Початковий стан фактів:', 'step');
+    addToProtocol(`f1=${facts.f1}, f2=${facts.f2}, f3=${facts.f3}, f4=${facts.f4}, f5=${facts.f5}, f6=${facts.f6}, f7=${facts.f7}, f8=${facts.f8}`, 'step');
 
     addToExplanation('Розпочинаємо роботу експертної системи для налаштування температури води.', 'step');
     addToExplanation('Мета: досягти теплої води (f7 = true).', 'step');
@@ -270,55 +215,62 @@ function runAlgorithm() {
 
         // Перевіряємо правила у порядку 1 → 4
         for (let rule of rules) {
+            addToProtocol(`\nПродукція ${rule.id}:`, 'step');
+
             const pValue = rule.p();
+            addToProtocol(`Блок P: «${rule.pDescription}» = ${pValue ? 1 : 0}`, 'step');
+
+            if (!pValue) {
+                addToProtocol(`Ядро продукції ${rule.id} не буде активоване (P = 0)`, 'step');
+                addToProtocol('Перехід до наступної продукції', 'step');
+                continue;
+            }
+
+            addToProtocol('Переходимо до ядра продукції (оскільки P = 1) і намагаємося його активувати', 'step');
             const aValue = rule.a();
+            addToProtocol(`Блок A: «${rule.aDescription}» = ${aValue ? 1 : 0}`, 'step');
 
-            addToProtocol(
-                `Правило ${rule.id}: P = ${pValue}, A = ${aValue}`,
-                'step'
-            );
-            addToProtocol(
-                `  P: ${rule.pDescription} = ${pValue}`,
-                'step'
-            );
-            addToProtocol(
-                `  A: ${rule.aDescription} = ${aValue}`,
-                'step'
-            );
-
-            if (pValue && aValue) {
+            if (aValue) {
                 // Правило спрацювало
-                addToProtocol(`✓ Правило ${rule.id} АКТИВОВАНЕ`, 'success');
+                addToProtocol(`✓ Ядро продукції ${rule.id} АКТИВОВАНЕ`, 'success');
                 addToExplanation(
-                    `Крок ${iteration}. Активовано правило ${rule.id}. ${rule.explanation}`,
+                    `Крок ${iteration}. Умови правила ${rule.id} виконані. ${rule.explanation}`,
                     'step'
                 );
 
                 // Виконуємо дію
                 const result = executeAction(rule.action);
 
-                addToProtocol(`  Дія: ${result.action}`, 'step');
+                addToProtocol(`Викликається функція: ${result.action}`, 'step');
                 if (result.changes.length > 0) {
-                    addToProtocol(`  Зміни фактів: ${result.changes.join(', ')}`, 'step');
-                    addToExplanation(`  Змінено: ${result.changes.join(', ')}`, 'step');
+                    result.changes.forEach(change => {
+                        addToProtocol(`Змінено: ${change}`, 'step');
+                    });
+                    addToExplanation(`Змінено факти: ${result.changes.join(', ')}`, 'step');
                 }
+
+                addToProtocol('Оскільки ядро продукції було активоване, алгоритм переходить на початок списку продукцій', 'step');
+                addToProtocol(`Новий стан: f1=${facts.f1}, f2=${facts.f2}, f3=${facts.f3}, f4=${facts.f4}, f5=${facts.f5}, f6=${facts.f6}, f7=${facts.f7}, f8=${facts.f8}`, 'step');
 
                 // Синхронізуємо інтерфейс
                 syncFactsToUI();
 
                 ruleExecuted = true;
 
-                // Повертаємося на початок (переривання циклу for, while продовжиться)
+                // Повертаємося на початок
                 break;
+            } else {
+                addToProtocol(`Ядро продукції ${rule.id} не буде активоване (A = 0)`, 'step');
+                addToProtocol('Перехід до наступної продукції', 'step');
             }
         }
 
         if (!ruleExecuted) {
-            addToProtocol('✗ Жодне правило не активоване на цій ітерації', 'warning');
+            addToProtocol('✗ Експертна система опинилася у стані, коли більше немає активних правил для подальшого виконання', 'warning');
 
             if (!facts.f7) {
                 addToExplanation(
-                    '✗ Система не може більше змінити стан: немає активних правил, але вода не стала теплою.',
+                    '✗ Система не може більше змінити стан: немає активних правил, вода не стала теплою.',
                     'error'
                 );
             }
@@ -331,7 +283,7 @@ function runAlgorithm() {
     }
 
     addToProtocol('\n=== КІНЕЦЬ РОБОТИ АЛГОРИТМУ ===', 'step');
-    addToProtocol(`Фінальний стан фактів: ${JSON.stringify(facts, null, 2)}`, 'step');
+    addToProtocol(`Фінальний стан: f1=${facts.f1}, f2=${facts.f2}, f3=${facts.f3}, f4=${facts.f4}, f5=${facts.f5}, f6=${facts.f6}, f7=${facts.f7}, f8=${facts.f8}`, 'step');
     addToProtocol(`Загальна кількість ітерацій: ${iteration}`, 'step');
 
     // Відображаємо протоколи
@@ -403,14 +355,6 @@ function resetFacts() {
         f8: 1
     };
 
-    hotValveLevel = 0;
-    coldValveLevel = 0;
-
     syncFactsToUI();
     clearProtocol();
-}
-
-// Друк результатів
-function printResults() {
-    window.print();
 }

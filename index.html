@@ -108,33 +108,34 @@
             <!-- Блок 2: База правил -->
             <div class="block">
                 <h2>База продукційних правил</h2>
+                <p style="font-size: 13px; color: #6c757d; margin-bottom: 10px;">Формат: &lt;номер, A (ядро), P (умова), дія&gt;</p>
                 <div class="rules-list">
                     <div class="rule">
                         <strong>Правило 1:</strong>
-                        <p>Блок P: ¬f4 ∧ ¬f7</p>
                         <p>Блок A: f1 ∧ f5</p>
+                        <p>Блок P: ¬f4 ∧ ¬f7</p>
                         <p>Дія: ВідкритиВентильХолодноїВодиНа(f8)</p>
                         <p class="rule-desc">Якщо вода гаряча і вентиль гарячої води відкритий, відкрити вентиль холодної води</p>
                     </div>
                     <div class="rule">
                         <strong>Правило 2:</strong>
-                        <p>Блок P: ¬f3 ∧ ¬f7</p>
                         <p>Блок A: f2 ∧ f6</p>
+                        <p>Блок P: ¬f3 ∧ ¬f7</p>
                         <p>Дія: ВідкритиВентильГарячоїВодиНа(f8)</p>
                         <p class="rule-desc">Якщо вода холодна і вентиль холодної води відкритий, відкрити вентиль гарячої води</p>
                     </div>
                     <div class="rule">
                         <strong>Правило 3:</strong>
-                        <p>Блок P: f3 ∧ ¬f7</p>
                         <p>Блок A: f1 ∧ f2 ∧ f5</p>
+                        <p>Блок P: f3 ∧ ¬f7</p>
                         <p>Дія: ЗакритиВентильГарячоїВоди()</p>
                         <p class="rule-desc">Якщо обидва вентилі відкриті, вода гаряча, і вентиль гарячої води повністю відкритий, закрити вентиль гарячої води</p>
                     </div>
                     <div class="rule">
                         <strong>Правило 4:</strong>
-                        <p>Блок P: f4 ∧ ¬f7</p>
                         <p>Блок A: f1 ∧ f2 ∧ f6</p>
-                        <p>Dія: ЗакритиВентильХолодноїВоди()</p>
+                        <p>Блок P: f4 ∧ ¬f7</p>
+                        <p>Дія: ЗакритиВентильХолодноїВоди()</p>
                         <p class="rule-desc">Якщо обидва вентилі відкриті, вода холодна, і вентиль холодної води повністю відкритий, закрити вентиль холодної води</p>
                     </div>
                 </div>
@@ -147,7 +148,6 @@
                     <button onclick="runAlgorithm()" class="btn btn-primary">Запустити алгоритм</button>
                     <button onclick="clearProtocol()" class="btn btn-secondary">Очистити протокол</button>
                     <button onclick="resetFacts()" class="btn btn-secondary">Скинути до початкових значень</button>
-                    <button onclick="printResults()" class="btn btn-secondary">Друк результатів</button>
                 </div>
             </div>
 

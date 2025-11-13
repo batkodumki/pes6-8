@@ -260,24 +260,3 @@ input[type="number"] {
         grid-template-columns: 1fr;
     }
 }
-
-/* Стилі для друку */
-@media print {
-    body {
-        background: white;
-        padding: 0;
-    }
-
-    .container {
-        box-shadow: none;
-    }
-
-    .controls {
-        display: none;
-    }
-
-    .block {
-        page-break-inside: avoid;
-        margin-bottom: 20px;
-    }
-}
